@@ -8,6 +8,16 @@ log = logging.getLogger(__name__)
 
 class Bitbucket(AtlassianRestAPI):
 
+    def _get_paged(self, url, params):
+        params['start'] = 0
+        response = self.get(url, params=params)
+        values = response.get('values')
+        while not response.get('isLastPage'):
+            params['start'] = response.get('nextPageStart')
+            response = self.get(url, params=params)
+            values += response.get('values')
+        return values
+
     def project_list(self, limit=None):
         """
         Provide the project list
@@ -978,7 +988,9 @@ class Bitbucket(AtlassianRestAPI):
             params['limit'] = limit
         if merges:
             params['merges'] = merges
-        return (self.get(url, params=params) or {}).get('values')
+
+        return self._get_paged(url, params)
+
 
     def get_commit_info(self, project, repository, commit, path=None):
         """
