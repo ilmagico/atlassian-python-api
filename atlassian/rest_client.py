@@ -186,6 +186,7 @@ class AtlassianRestAPI(object):
             except requests.exceptions.HTTPError as err:
                 log.error("HTTP Error occurred")
                 log.error('Response is: {content}'.format(content=err.response.content))
+        response.raise_for_status()
         return response
 
     def get(self, path, data=None, flags=None, params=None, headers=None, not_json_response=None, trailing=None):
