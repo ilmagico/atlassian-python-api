@@ -816,7 +816,7 @@ class Bitbucket(AtlassianRestAPI):
         }
         return self.put(url, data=payload)
 
-    def get_pullrequest(self, project, repository, pull_request_id):
+    def get_pull_request(self, project, repository, pull_request_id):
         """
         Retrieve a pull request.
         The authenticated user must have REPO_READ permission
@@ -831,6 +831,12 @@ class Bitbucket(AtlassianRestAPI):
             repository=repository,
             pullRequestId=pull_request_id)
         return self.get(url)
+
+    def get_pullrequest(self, *args, **kwargs):
+        """
+        Deprecated name for get_pull_requests()
+        """
+        return self.get_pull_request(*args, **kwargs)
 
     def change_reviewed_status(self, project_key, repository_slug, pull_request_id, status, user_slug):
         """
