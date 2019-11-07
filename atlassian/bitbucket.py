@@ -950,7 +950,7 @@ class Bitbucket(AtlassianRestAPI):
             params['to'] = hash_newest
         return (self.get(url, params=params) or {}).get('diffs')
 
-    def get_commits(self, project, repository, hash_oldest, hash_newest, limit=99999):
+    def get_commits(self, project, repository, hash_oldest, hash_newest, limit=None, merges=None):
         """
         Get commit list from repo
         :param project:
@@ -970,6 +970,8 @@ class Bitbucket(AtlassianRestAPI):
             params['until'] = hash_newest
         if limit:
             params['limit'] = limit
+        if merges:
+            params['merges'] = merges
         return (self.get(url, params=params) or {}).get('values')
 
     def get_commit_info(self, project, repository, commit, path=None):
