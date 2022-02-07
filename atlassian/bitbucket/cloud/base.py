@@ -2,6 +2,8 @@
 
 from ..base import BitbucketBase
 
+from requests import HTTPError
+
 
 class BitbucketCloudBase(BitbucketBase):
     def __init__(self, url, *args, **kwargs):
@@ -78,6 +80,33 @@ class BitbucketCloudBase(BitbucketBase):
                     break
                 # From now on we have absolute URLs with parameters
                 absolute = True
-                params = None
+                # Params are now provided by the url
+                params = {}
+                # Trailing should not be added as it is already part of the url
+                trailing = False
 
         return
+
+    def raise_for_status(self, response):
+        """
+        Checks the response for errors and throws an exception if return code >= 400
+
+        Implementation for Bitbucket Cloud according to
+        https://developer.atlassian.com/cloud/bitbucket/rest/intro/#standardized-error-responses
+
+        :param response:
+        :return:
+        """
+        if 400 <= response.status_code < 600:
+            try:
+                j = response.json()
+                e = j["error"]
+                error_msg = e["message"]
+                if e.get("detail"):
+                    error_msg += "\n" + e["detail"]
+            except Exception:
+                response.raise_for_status()
+            else:
+                raise HTTPError(error_msg, response=response)
+        else:
+            response.raise_for_status()
